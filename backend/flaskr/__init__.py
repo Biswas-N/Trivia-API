@@ -45,20 +45,47 @@ def create_app(test_config=False):
         start = QUESTIONS_PER_PAGE * (page_number - 1)
         end = start + QUESTIONS_PER_PAGE
 
-        questions = Question.query.all()
-        formatted_questions = [question.format() for question in questions]
-        paginated_questions = formatted_questions[start:end]
-
         categories = Category.query.all()
         formatted_categories = [category.format() for category in categories]
+        questions = Question.query.all()
+        formatted_questions = [question.format() for question in questions]
 
-        return jsonify({
-            "success": True,
-            "questions": paginated_questions,
-            "total_questions": len(formatted_questions),
-            "categories": formatted_categories,
-            "current_category": None
-        })
+        # Check if we have any questions
+        #   if yes
+        #       then
+        #       404 - if out of bound page number (like 1000th page for 2 questions)
+        #       200 - else wise
+        #   else (no questions)
+        #       404 - if its not the first page
+        #       200 - else wise
+        if len(formatted_questions) != 0:
+            if start >= len(formatted_questions):
+                return jsonify({
+                    "success": False
+                }), 404
+            else:
+                paginated_questions = formatted_questions[start:end]
+
+                return jsonify({
+                    "success": True,
+                    "questions": paginated_questions,
+                    "total_questions": len(formatted_questions),
+                    "categories": formatted_categories,
+                    "current_category": None
+                })
+        else:
+            if page_number > 1:
+                return jsonify({
+                    "success": False
+                }), 404
+            else:
+                return jsonify({
+                    "success": True,
+                    "questions": [],
+                    "total_questions": 0,
+                    "categories": formatted_categories,
+                    "current_category": None
+                })
     '''
     @TODO: 
     Create an endpoint to handle GET requests for questions, 

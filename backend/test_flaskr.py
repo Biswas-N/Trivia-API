@@ -35,11 +35,40 @@ class TriviaTestCase(unittest.TestCase):
     """
 
     def test_get_all_categories(self):
+        """
+        Test to verify GET /categories endpoint
+        status codes: 200
+        exceptions: None
+        """
         res = self.client().get("/categories")
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(200, res.status_code)
         self.assertTrue(data['success'])
+
+    """
+        Test cases for Question resource endpoints
+    """
+
+    def test_get_all_questions(self):
+        """
+        Test to verify GET /questions endpoint
+        status codes: 200, 404
+        exceptions: PageNotFound
+        """
+        # 200 test
+        res = self.client().get("/questions?page=1")
+        data = json.loads(res.data)
+
+        self.assertEqual(200, res.status_code)
+        self.assertTrue(data['success'])
+
+        # 404 test
+        res = self.client().get("/questions?page=10000")
+        data = json.loads(res.data)
+
+        self.assertEqual(404, res.status_code)
+        self.assertFalse(data['success'])
 
 
 # Make the tests conveniently executable
