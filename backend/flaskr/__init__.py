@@ -60,9 +60,7 @@ def create_app(test_config=False):
         #       200 - else wise
         if len(formatted_questions) != 0:
             if start >= len(formatted_questions):
-                return jsonify({
-                    "success": False
-                }), 404
+                abort(404)
             else:
                 paginated_questions = formatted_questions[start:end]
 
@@ -75,9 +73,7 @@ def create_app(test_config=False):
                 })
         else:
             if page_number > 1:
-                return jsonify({
-                    "success": False
-                }), 404
+                abort(404)
             else:
                 return jsonify({
                     "success": True,
@@ -86,19 +82,36 @@ def create_app(test_config=False):
                     "categories": formatted_categories,
                     "current_category": None
                 })
-    '''
-    @TODO: 
-    Create an endpoint to handle GET requests for questions, 
-    including pagination (every 10 questions). 
-    This endpoint should return a list of questions, 
-    number of total questions, current category, categories. 
-    
-    TEST: At this point, when you start the application
-    you should see questions and categories generated,
-    ten questions per page and pagination at the bottom of the screen for three pages.
-    Clicking on the page numbers should update the questions. 
-    '''
 
+    @app.route("/questions/<int:question_id>", methods=['DELETE'])
+    def delete_question(question_id):
+        question = Question.query.get_or_404(question_id)
+
+        try:
+            question.delete()
+            return jsonify({
+                "success": True,
+                "question_id": question.id
+            })
+        except Exception:
+            abort(500)
+
+    # --- Error Handlers --- #
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 404,
+            "message": "resource not found"
+        }), 404
+
+    @app.errorhandler(500)
+    def internal_error(error):
+        return jsonify({
+            "success": False,
+            "error": 500,
+            "message": "internal server error"
+        }), 500
     '''
     @TODO: 
     Create an endpoint to DELETE question using a question ID. 
