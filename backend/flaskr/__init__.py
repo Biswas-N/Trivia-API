@@ -6,10 +6,11 @@ from models import setup_db, Question, Category
 QUESTIONS_PER_PAGE = 10
 
 
-def create_app(test_config=None):
+def create_app(test_config=False):
     # create and configure the app
     app = Flask(__name__)
-    setup_db(app)
+    if not test_config:
+        setup_db(app)
 
     # Enabling Cross Origin Resource Sharing to Flask app
     CORS(app=app)

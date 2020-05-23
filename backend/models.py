@@ -4,14 +4,14 @@ from flask_sqlalchemy import SQLAlchemy
 database_name = "trivia"
 database_host = "localhost:5432"
 username_pwd = "biswas:T@me0302"
-database_path = "postgres://{}@{}/{}".format(username_pwd, database_host, database_name)
+database_path = "postgresql://{}@{}/{}".format(username_pwd, database_host, database_name)
 
 db = SQLAlchemy()
 
 
 def setup_db(app, database_path=database_path):
     """
-      setup_db(app)
+        setup_db(app)
             binds a flask application and a SQLAlchemy service
     """
     app.config["SQLALCHEMY_DATABASE_URI"] = database_path
