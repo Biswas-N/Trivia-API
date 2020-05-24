@@ -1,6 +1,5 @@
 import unittest
 import json
-from flask_sqlalchemy import SQLAlchemy
 
 from flaskr import create_app
 from models import setup_db, Question, Category
@@ -77,15 +76,17 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(404, res.status_code)
         self.assertFalse(data['success'])
+        self.assertEqual("resource not found", data['message'])
 
     def test_delete_question(self):
         """
         Test to verify DELETE /questions/<question_id> endpoint
-        status codes: 200, 404
-        exceptions: ResourceNotFound
+        status codes: 200, 404, 500
+        exceptions: ResourceNotFound, InternalServerError
         """
         # Inserting sample data into database
         question_id = insert_dummy_data()
+
         # 200 test
         res = self.client().delete('/questions/' + str(question_id))
         data = json.loads(res.data)
@@ -100,6 +101,39 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(404, res.status_code)
         self.assertFalse(data['success'])
+        self.assertEqual("resource not found", data['message'])
+
+    def test_create_question(self):
+        """
+        Test to verify DELETE /questions/<question_id> endpoint
+        status codes: 201, 400, 500
+        exceptions: BadRequest, InternalServerError
+        """
+        # 201 test
+        dummy_question = {
+            'question': 'A second dummy question ?',
+            'answer': 'Second dummy answer',
+            'category': 1,
+            'difficulty': 1
+        }
+        res = self.client().post("/questions", json=dummy_question)
+        data = json.loads(res.data)
+
+        self.assertEqual(201, res.status_code)
+        self.assertTrue(data['success'])
+        self.assertEqual(dummy_question['question'], data['new_question']['question'])
+
+        # 400 test
+        bad_dummy_question = {
+            'question': 'A bad dummy question ?',
+            'difficulty': 1
+        }
+        res = self.client().post("/questions", json=bad_dummy_question)
+        data = json.loads(res.data)
+
+        self.assertEqual(400, res.status_code)
+        self.assertFalse(data['success'])
+        self.assertEqual("bad request", data['message'])
 
 
 # Make the tests conveniently executable
