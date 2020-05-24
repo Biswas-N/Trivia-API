@@ -103,7 +103,7 @@ def create_app(test_config=False):
         data = request.get_json()
         expected_data_keys = sorted(['question', 'answer', 'category', 'difficulty'])
 
-        # Checking if all the columns exist in the incoming data
+        # Checking if all the columns(keys) exist in the incoming data
         if sorted([key for key in data]) == expected_data_keys:
             new_question = Question(**data)
             try:
@@ -116,16 +116,23 @@ def create_app(test_config=False):
                 abort(500)
         else:
             abort(400)
-    '''
-    TODO: 
-    Create an endpoint to POST a new question, 
-    which will require the question and answer text, 
-    category, and difficulty score.
 
-    TEST: When you submit a question on the "Add" tab, 
-    the form will clear and the question will appear at the end of the last page
-    of the questions list in the "List" tab.  
-    '''
+    # Get a Question based on Search term (cRud - Using POST)
+    @app.route("/questions/search", methods=['POST'])
+    def search_question():
+        data = request.get_json()
+
+        if "searchTerm" in data:
+            questions = Question.query.filter(Question.question.ilike(f"%{data['searchTerm']}%"))
+            formatted_questions = [question.format() for question in questions]
+
+            return jsonify({
+                'success': True,
+                'total_questions': len(formatted_questions),
+                'questions': formatted_questions
+            })
+        else:
+            abort(400)
 
     '''
     @TODO: 

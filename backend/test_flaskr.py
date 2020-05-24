@@ -37,9 +37,7 @@ class TriviaTestCase(unittest.TestCase):
         """Executed after reach test"""
         pass
 
-    """
-        Test cases for Category resource endpoints
-    """
+    # --- Tests for Category resource endpoints --- #
 
     def test_get_all_categories(self):
         """
@@ -53,9 +51,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(200, res.status_code)
         self.assertTrue(data['success'])
 
-    """
-        Test cases for Question resource endpoints
-    """
+    # --- Tests for Question resource endpoints --- #
 
     def test_get_all_questions(self):
         """
@@ -134,6 +130,34 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(400, res.status_code)
         self.assertFalse(data['success'])
         self.assertEqual("bad request", data['message'])
+
+    def test_search_question(self):
+        """
+        Test to verify POST /questions for search functionality
+        status codes: 200, 400
+        exceptions: BadRequest
+        """
+        # 200 test
+        search_data = {
+            "searchTerm": "dummy"
+        }
+        res = self.client().post("/questions/search", json=search_data)
+        data = json.loads(res.data)
+
+        self.assertEqual(200, res.status_code)
+        self.assertTrue(data['success'])
+        self.assertTrue(data['total_questions'] >= 0)
+        self.assertIsNotNone(data['questions'])
+
+        # 400 test
+        bad_search_data = {
+            "searchTTTTerm": "dummy"
+        }
+        res = self.client().post("/questions", json=bad_search_data)
+        data = json.loads(res.data)
+
+        self.assertEqual(400, res.status_code)
+        self.assertFalse(data['success'])
 
 
 # Make the tests conveniently executable
