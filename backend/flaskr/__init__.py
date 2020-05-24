@@ -36,6 +36,20 @@ def create_app(test_config=False):
             "categories": formatted_categories
         })
 
+    # Get Questions based on Category (cRud - Using GET)
+    @app.route("/categories/<int:category_id>/questions")
+    def get_questions_by_category(category_id):
+        category = Category.query.get_or_404(category_id)
+        questions = category.questions
+        formatted_questions = [question.format() for question in questions]
+
+        return jsonify({
+            "success": True,
+            "questions": formatted_questions,
+            "total_questions": len(formatted_questions),
+            "current_category": category.id,
+        })
+
     # --- Question Resource Endpoints --- #
 
     # Get All Questions (cRud - Using GET)
@@ -105,8 +119,11 @@ def create_app(test_config=False):
 
         # Checking if all the columns(keys) exist in the incoming data
         if sorted([key for key in data]) == expected_data_keys:
+            category = data.pop('category')
             new_question = Question(**data)
+
             try:
+                new_question.category = Category.query.get(category)
                 new_question.insert()
                 return jsonify({
                     'success': True,
@@ -134,25 +151,8 @@ def create_app(test_config=False):
         else:
             abort(400)
 
-    '''
-    @TODO: 
-    Create a POST endpoint to get questions based on a search term. 
-    It should return any questions for whom the search term 
-    is a substring of the question. 
 
-    TEST: Search by any phrase. The questions list will update to include 
-    only question that include that string within their question. 
-    Try using the word "title" to start. 
-    '''
 
-    '''
-    @TODO: 
-    Create a GET endpoint to get questions based on category. 
-
-    TEST: In the "List" tab / main screen, clicking on one of the 
-    categories in the left column will cause only questions of that 
-    category to be shown. 
-    '''
 
     '''
     @TODO: 

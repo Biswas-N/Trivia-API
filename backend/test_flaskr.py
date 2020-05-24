@@ -7,14 +7,17 @@ from models import setup_db, Question, Category
 
 def insert_dummy_data():
     """Utility function to insert dummy data"""
+    dummy_category = {
+        'type': 'History'
+    }
     dummy_question = {
         'question': 'A dummy question ?',
         'answer': 'Dummy answer',
-        'category': 1,
         'difficulty': 1
     }
-
+    sample_category = Category(**dummy_category)
     sample_question = Question(**dummy_question)
+    sample_question.category = sample_category
     sample_question.insert()
 
     return sample_question.id
@@ -51,7 +54,30 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(200, res.status_code)
         self.assertTrue(data['success'])
 
-    # --- Tests for Question resource endpoints --- #
+    def test_get_questions_by_category(self):
+        """
+        Test to verify GET /categories/<id>/questions endpoint
+        status codes: 200, 404
+        exceptions: ResourceNotFound
+        """
+        # 200 test
+        res = self.client().get("/categories/1/questions")
+        data = json.loads(res.data)
+
+        self.assertEqual(200, res.status_code)
+        self.assertTrue(data['success'])
+        self.assertIsNotNone(data['questions'])
+        self.assertTrue(data['total_questions'] >= 0)
+        self.assertTrue(data['current_category'])
+
+        # 404 test
+        res = self.client().get("/categories/1000/questions")
+        data = json.loads(res.data)
+
+        self.assertEqual(404, res.status_code)
+        self.assertFalse(data['success'])
+
+    # # --- Tests for Question resource endpoints --- #
 
     def test_get_all_questions(self):
         """
