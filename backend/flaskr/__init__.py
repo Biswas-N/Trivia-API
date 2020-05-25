@@ -61,7 +61,7 @@ def create_app(test_config=False):
         end = start + QUESTIONS_PER_PAGE
 
         categories = Category.query.all()
-        formatted_categories = [category.format() for category in categories]
+        formatted_categories = {category.id: category.type for category in categories}
         questions = Question.query.all()
         formatted_questions = [question.format() for question in questions]
 
