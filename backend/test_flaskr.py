@@ -77,7 +77,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(404, res.status_code)
         self.assertFalse(data['success'])
 
-    # # --- Tests for Question resource endpoints --- #
+    # --- Tests for Question resource endpoints --- #
 
     def test_get_all_questions(self):
         """

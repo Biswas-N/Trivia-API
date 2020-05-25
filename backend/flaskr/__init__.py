@@ -173,6 +173,7 @@ def create_app(test_config=False):
     # --- Error Handlers --- #
     @app.errorhandler(404)
     def not_found(error):
+        print(error)
         return jsonify({
             "success": False,
             "error": 404,
@@ -181,6 +182,7 @@ def create_app(test_config=False):
 
     @app.errorhandler(400)
     def bad_request(error):
+        print(error)
         return jsonify({
             "success": False,
             "error": 400,
@@ -189,6 +191,7 @@ def create_app(test_config=False):
 
     @app.errorhandler(500)
     def internal_error(error):
+        print(error)
         return jsonify({
             "success": False,
             "error": 500,
