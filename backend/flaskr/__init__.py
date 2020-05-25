@@ -29,7 +29,7 @@ def create_app(test_config=False):
     @app.route("/categories")
     def get_all_categories():
         categories = Category.query.all()
-        formatted_categories = [category.format() for category in categories]
+        formatted_categories = {category.id: category.type for category in categories}
 
         return jsonify({
             "success": True,
@@ -158,17 +158,22 @@ def create_app(test_config=False):
     def get_quiz_question():
         data = request.get_json()
 
-        category = Category.query.get_or_404(data['quiz_category'])
+        category = Category.query.get_or_404(data['quiz_category']['id'])
         category_questions = category.questions
         question_ids = [question.id for question in category_questions]
+
         unused_question_ids = [qid for qid in question_ids if qid not in data['previous_questions']]
-
-        question = Question.query.get(random.choice(unused_question_ids))
-
-        return jsonify({
-            'success': True,
-            'question': question.format()
-        }), 200
+        if len(unused_question_ids) > 0:
+            question = Question.query.get(random.choice(unused_question_ids))
+            return jsonify({
+                'success': True,
+                'question': question.format()
+            }), 200
+        else:
+            return jsonify({
+                'success': True,
+                'question': None
+            }), 200
 
     # --- Error Handlers --- #
     @app.errorhandler(404)
