@@ -1,5 +1,6 @@
 from flask import Flask, request, abort, jsonify
 from flask_cors import CORS
+import random
 
 from models import setup_db, Question, Category
 
@@ -151,26 +152,23 @@ def create_app(test_config=False):
         else:
             abort(400)
 
+    # Get a questions based on category and previous questions asked
+    # Using POST
+    @app.route("/quizzes", methods=['POST'])
+    def get_quiz_question():
+        data = request.get_json()
 
+        category = Category.query.get_or_404(data['quiz_category'])
+        category_questions = category.questions
+        question_ids = [question.id for question in category_questions]
+        unused_question_ids = [qid for qid in question_ids if qid not in data['previous_questions']]
 
+        question = Question.query.get(random.choice(unused_question_ids))
 
-    '''
-    @TODO: 
-    Create a POST endpoint to get questions to play the quiz. 
-    This endpoint should take category and previous question parameters 
-    and return a random questions within the given category, 
-    if provided, and that is not one of the previous questions. 
-
-    TEST: In the "Play" tab, after a user selects "All" or a category,
-    one question at a time is displayed, the user is allowed to answer
-    and shown whether they were correct or not. 
-    '''
-
-    '''
-    @TODO: 
-    Create error handlers for all expected errors 
-    including 404 and 422. 
-    '''
+        return jsonify({
+            'success': True,
+            'question': question.format()
+        }), 200
 
     # --- Error Handlers --- #
     @app.errorhandler(404)
