@@ -1,12 +1,12 @@
-# Full Stack Trivia API Backend
+# Trivia API Backend
 
 ## Getting Started
 
-### Installing Dependencies
+### Dependencies
 
-#### Python 3.7
+#### Python 3.8
 
-Follow instructions to install the latest version of python for your platform in the [python docs](https://docs.python.org/3/using/unix.html#getting-and-installing-the-latest-version-of-python)
+Follow instructions to install the latest version of python [on Unix OS](https://docs.python.org/3/using/unix.html#getting-and-installing-the-latest-version-of-python) and [on Windows OS](https://docs.python.org/3/using/windows.html)
 
 #### Virtual Enviornment
 
@@ -31,10 +31,12 @@ This will install all of the required packages we selected within the `requireme
 - [Flask-CORS](https://flask-cors.readthedocs.io/en/latest/#) is the extension we'll use to handle cross origin requests from our frontend server. 
 
 ## Database Setup
-With Postgres running, restore a database using the trivia.psql file provided. From the backend folder in terminal run:
-```bash
-psql trivia < trivia.psql
-```
+With Postgres running, follow these steps to create a database and seed some sample data into the database:
+1. Create a new database using the command
+   ```bash
+   $ createdb trivia
+   ```
+2. Later, run the python file `data_feeder.py` to seed some sample data
 
 ## Running the server
 
@@ -43,58 +45,186 @@ From within the `backend` directory first ensure you are working using your crea
 To run the server, execute:
 
 ```bash
-export FLASK_APP=flaskr
-export FLASK_ENV=development
-flask run
+$ python app.py
 ```
 
-Setting the `FLASK_ENV` variable to `development` will detect file changes and restart the server automatically.
+## Endpoints
 
-Setting the `FLASK_APP` variable to `flaskr` directs flask to use the `flaskr` directory and the `__init__.py` file to find the application. 
+#### Overview
 
-## Tasks
+These are the following endpoints available to access the resources in Trivia API
 
-One note before you delve into your tasks: for each endpoint you are expected to define the endpoint and response data. The frontend will be a plentiful resource because it is set up to expect certain endpoints and response data formats already. You should feel free to specify endpoints in your own way; if you do so, make sure to update the frontend or you will get some unexpected behavior. 
+1. Catagory related endpoints
+   ```
+   GET '/categories'                                - All categories
+   GET '/categories/<int:category_id>/questions'    - All questions per category
+   ```
+2. Question related endpoints
+   ```
+   GET '/questions'                                 - All questions
+   POST '/questions'                                - Create a new question
+   POST '/questions/search'                         - Search for existing question
+   DELETE '/questions/<int:question_id>'            - Delete a question (using Question ID)
+   ```
+3. And lastly, endpoint to generate random questions from selected category
+   ```
+   POST '/quizzes'
+   ```
 
-1. Use Flask-CORS to enable cross-domain requests and set response headers. 
-2. Create an endpoint to handle GET requests for questions, including pagination (every 10 questions). This endpoint should return a list of questions, number of total questions, current category, categories. 
-3. Create an endpoint to handle GET requests for all available categories. 
-4. Create an endpoint to DELETE question using a question ID. 
-5. Create an endpoint to POST a new question, which will require the question and answer text, category, and difficulty score. 
-6. Create a POST endpoint to get questions based on category. 
-7. Create a POST endpoint to get questions based on a search term. It should return any questions for whom the search term is a substring of the question. 
-8. Create a POST endpoint to get questions to play the quiz. This endpoint should take category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions. 
-9. Create error handlers for all expected errors including 400, 404, 422 and 500. 
+#### Detailed Information
 
-REVIEW_COMMENT
 ```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
-
-Endpoints
 GET '/categories'
-GET ...
-POST ...
-DELETE ...
-
-GET '/categories'
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
+- Gets a key-value pair json object, key being the ID and value being the type of the category
 - Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
+- Response: JSON object with key (Category ID): Value (Category Type), count and success
+- Sample
+    {
+      "categories": {
+        "1": "Science",
+        "2": "Art",
+        "3": "Geography",
+        "4": "History",
+        "5": "Entertainment",
+        "6": "Sports"
+      },
+      "count": 6,
+      "success": true
+    }
 
+GET '/categories/<int:category_id>/questions'
+- Gets an array of json objects of questions belonging to the requested category
+- Request Arguments: Flask named parameter (1 in this sample)
+- Response: JSON object with current_category, questions (an array), total_questions
+  and success
+- Sample
+    {
+      "current_category": 1,
+      "questions": [
+        {
+          "answer": "Muhammad Ali",
+          "category": 1,
+          "difficulty": 4,
+          "id": 2,
+          "question": "What boxer's original name is Cassius Clay?"
+        },
+        {
+          "answer": "Uruguay",
+          "category": 1,
+          "difficulty": 6,
+          "id": 7,
+          "question": "Which country won the first ever soccer World Cup in 1930?"
+        }
+      ],
+      "success": true,
+      "total_questions": 2
+    }
+
+GET '/questions'
+- Gets a JSON object of categories and an array of JSON objects holding questions
+- Request Arguments: None
+- Response: categories (A JSON object), questions (List of JSON objects holding questions),
+  total_questions and success
+- Sample
+    {
+      "categories": {
+        "1": "Science",
+        "2": "Art",
+      },
+      "questions": [
+        {
+          "answer": "Muhammad Ali",
+          "category": 1,
+          "difficulty": 4,
+          "id": 2,
+          "question": "What boxer's original name is Cassius Clay?"
+        },
+        {
+          "answer": "Apollo 13",
+          "category": 3,
+          "difficulty": 5,
+          "id": 3,
+          "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+        },
+        {
+          "answer": "Tom Cruise",
+          "category": 5,
+          "difficulty": 5,
+          "id": 4,
+          "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+        }
+      ],
+      "success": true,
+      "total_questions": 3
+    }
+
+POST '/questions'
+- Creats a new questions based on JSON data received
+- Request Arguments: None (but needs a JSON object of new question as data)
+- Response: new_question (JSON object) and success
+- Sample
+    {
+        'success': True,
+        'new_question': {
+              "answer": "Tom Cruise",
+              "category": 5,
+              "difficulty": 5,
+              "id": 4,
+              "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+            }
+    }
+
+POST '/questions/search'
+- Get matching (case-insensitive) questions in the form of JSON objects
+- Request Arguments: None (but needs a JSON object holding a key "searchTerm")
+- Response: A JSON object with success, total_questions and questions (array)
+- Sample
+    {
+        'success': True,
+        'total_questions': 1,
+        'questions': [
+            {
+                "answer": "Tom Cruise",
+                "category": 5,
+                "difficulty": 5,
+                "id": 4,
+                "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+            }
+        ]
+    }
+
+DELETE '/questions/<int:question_id>'
+- Deletes an existing question from the database
+- Request Arguments: Flask named parameter (1 in this sample)
+- Response: A JSON object with success and question_id which was deleted
+- Sample
+    {
+        'success': True,
+        'question_id': 1
+    }
+
+POST '/quizzes'
+- Gets a random (non repeating) question based on category given
+- Request Arguments: None (but a json object with key 'quiz_category' and value
+  holding a category JSON object)
+- Response: A JSON object with success and question JSON object
+- Sample
+    {
+        'success': True,
+        'question': {
+                "answer": "Tom Cruise",
+                "category": 5,
+                "difficulty": 5,
+                "id": 4,
+                "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+            }
+    }
 ```
-
 
 ## Testing
 To run the tests, run
 ```
 dropdb trivia_test
 createdb trivia_test
-psql trivia_test < trivia.psql
 python test_flaskr.py
 ```
