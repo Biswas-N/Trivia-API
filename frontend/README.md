@@ -1,4 +1,4 @@
-# Full Stack Trivia API  Frontend
+# Trivia API  Frontend
 
 ## Getting Setup
 
