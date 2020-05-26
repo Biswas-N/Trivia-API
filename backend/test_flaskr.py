@@ -194,19 +194,25 @@ class TriviaTestCase(unittest.TestCase):
         # 200 test
         req_data = {
             "previous_questions": [1, 2, 3],
-            "quiz_category": 1
+            "quiz_category": {
+                'id': 1,
+                'type': 'History'
+            }
         }
         res = self.client().post("/quizzes", json=req_data)
         data = json.loads(res.data)
 
         self.assertEqual(200, res.status_code)
         self.assertTrue(data['success'])
-        self.assertTrue(data['question'])
+        self.assertTrue('question' in data)
 
         # 404 test
         req_data = {
             "previous_questions": [1, 2, 3],
-            "quiz_category": 1000  # Unknown category
+            "quiz_category": {
+                'id': 1000,  # Unknown category
+                'type': 'History'
+            }
         }
         res = self.client().post("/quizzes", json=req_data)
         data = json.loads(res.data)
