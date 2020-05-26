@@ -7,6 +7,7 @@
 #### Python 3.8
 
 Follow instructions to install the latest version of python [on Unix OS](https://docs.python.org/3/using/unix.html#getting-and-installing-the-latest-version-of-python) and [on Windows OS](https://docs.python.org/3/using/windows.html)
+> The project's python code follow `PEP8 Styling Guide`
 
 #### Virtual Enviornment
 
