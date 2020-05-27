@@ -32,12 +32,11 @@ This will install all of the required packages we selected within the `requireme
 - [Flask-CORS](https://flask-cors.readthedocs.io/en/latest/#) is the extension we'll use to handle cross origin requests from our frontend server. 
 
 ## Database Setup
-With Postgres running, follow these steps to create a database and seed some sample data into the database:
-1. Create a new database using the command
-   ```bash
-   $ createdb trivia
-   ```
-2. Later, run the python file `data_feeder.py` to seed some sample data
+With Postgres running, create a new database using the command and execute `data_seeder.sql` using:
+```bash
+$ createdb trivia
+$ psql trivia < data_seeder.sql
+```
 
 ## Running the server
 
@@ -46,8 +45,13 @@ From within the `backend` directory first ensure you are working using your crea
 To run the server, execute:
 
 ```bash
-$ python app.py
+$ export FLASK_APP=flaskr
+$ export FLASK_ENV=development
+$ flask run
 ```
+Setting the FLASK_ENV variable to development will detect file changes and restart the server automatically.
+
+Setting the FLASK_APP variable to flaskr directs flask to use the flaskr directory and the __init__.py file to find the application.
 
 ## Endpoints
 
@@ -206,8 +210,9 @@ DELETE '/questions/<int:question_id>'
 
 POST '/quizzes'
 - Gets a random (non repeating) question based on category given
-- Request Arguments: None (but a json object with key 'quiz_category' and value
-  holding a category JSON object)
+- Request Arguments: None (but a json object with -
+ keys: quiz_category, value: category JSON object and
+ keys: previous_questions, value: an array of previous question id's)
 - Response: A JSON object with success and question JSON object
 - Sample
     {
