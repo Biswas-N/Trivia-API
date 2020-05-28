@@ -158,11 +158,15 @@ def create_app(test_config=False):
     def get_quiz_question():
         data = request.get_json()
 
-        category = Category.query.get_or_404(data['quiz_category']['id'])
-        category_questions = category.questions
-        question_ids = [question.id for question in category_questions]
+        if data['quiz_category']['id'] == 0:
+            category_questions = Question.query.all()
+        else:
+            category = Category.query.get_or_404(data['quiz_category']['id'])
+            category_questions = category.questions
 
+        question_ids = [question.id for question in category_questions]
         unused_question_ids = [qid for qid in question_ids if qid not in data['previous_questions']]
+
         if len(unused_question_ids) > 0:
             question = Question.query.get(random.choice(unused_question_ids))
             return jsonify({
